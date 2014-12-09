@@ -35,6 +35,8 @@ void bmk_init(void);
 void bmk_main(struct multiboot_info *);
 
 void bmk_cons_puts(const char *);
+void bmk_cons_puthex(int);
+void bmk_cons_putint(int);
 void bmk_cons_putc(int);
 
 void bmk_cpu_init(void);
