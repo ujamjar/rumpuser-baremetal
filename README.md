@@ -27,7 +27,7 @@ ARM port notes
 
 _In Progess_
 
-The initial target is the [ARM versatile-pb](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0224i/index.html) i
+The initial target is the [ARM versatile-pb](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0224i/index.html) 
 running under `qemu-system-arm`.
 
 ### Building and running

@@ -21,11 +21,10 @@ ENTRY(_start)
 loop:
   msr cpsr_c,#(SYS_MODE | NO_INT)   // straight into system mode
   ldr sp,=(_bootstack + stack_size) // set stack
-  blx bmk_cpu_vector_table          // init the vector table
+  blx bmk_init                      // init the vector table
   msr cpsr_c,#(SYS_MODE)            // turn on interrupts 
-  blx bmk_init                      // nothing at the moment - could do interrupt init instead?
   blx bmk_main
-	b loop
+	b .
 END(_start)
 
 ENTRY(bmk_cpu_isr)

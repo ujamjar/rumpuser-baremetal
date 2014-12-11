@@ -57,7 +57,9 @@ rumpuser_getparam(const char *name, void *buf, size_t buflen)
 				res[j-i] = tmp[i-1];
 			}
 		}
-
+	} else if (bmk_strcmp(name, "RUMP_THREADS") == 0) {
+    bmk_cons_puts("setting RUMP_THREADS to 0\n");
+		bmk_strncpy(buf, "0", buflen-1);
 	} else {
 		rv = 1;
 	}

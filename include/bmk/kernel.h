@@ -31,8 +31,9 @@ void *bmk_allocpg(size_t);
     } while (0);
 
 struct multiboot_info;
+int bmk_parsemem(void *);
 void bmk_init(void);
-void bmk_main(struct multiboot_info *);
+void bmk_main(void *);
 
 void bmk_cons_puts(const char *);
 void bmk_cons_puthex(int);

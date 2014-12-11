@@ -1,5 +1,9 @@
 #include <bmk/types.h>
+#include <bmk/multiboot.h>
 #include <bmk/kernel.h>
+
+unsigned long bmk_membase;
+unsigned long bmk_memsize;
 
 /* enter the kernel with interrupts disabled */
 int bmk_spldepth = 1;
@@ -235,3 +239,112 @@ bmk_cpu_nanohlt(void)
 	hlt();
 	outb(PIC1_DATA, 0xff & ~(1<<2));
 }
+
+
+/*
+ * console.  quick, cheap, dirty, etc.
+ * Should eventually keep an in-memory log.  printf-debugging is currently
+ * a bit, hmm, limited.
+ */
+ 
+#define CONS_WIDTH 80
+#define CONS_HEIGHT 25
+#define CONS_MAGENTA 0x500
+static volatile uint16_t *cons_buf = (volatile uint16_t *)0xb8000;
+
+static void
+cons_putat(int c, int x, int y)
+{
+
+	cons_buf[x + y*CONS_WIDTH] = CONS_MAGENTA|c;
+}
+
+/* display a character in the next available slot */
+void
+bmk_cons_putc(int c)
+{
+	static int cons_x;
+	static int cons_y;
+	int x;
+	int doclear = 0;
+
+	if (c == '\n') {
+		cons_x = 0;
+		cons_y++;
+		doclear = 1;
+	} else if (c == '\r') {
+		cons_x = 0;
+	} else {
+		cons_putat(c, cons_x++, cons_y);
+	}
+	if (cons_x == CONS_WIDTH) {
+		cons_x = 0;
+		cons_y++;
+		doclear = 1;
+	}
+	if (cons_y == CONS_HEIGHT) {
+		cons_y--;
+		/* scroll screen up one line */
+		for (x = 0; x < (CONS_HEIGHT-1)*CONS_WIDTH; x++)
+			cons_buf[x] = cons_buf[x+CONS_WIDTH];
+	}
+	if (doclear) {
+		for (x = 0; x < CONS_WIDTH; x++)
+			cons_putat(' ', x, cons_y);
+	}
+}
+
+/*
+ * init.  currently just clears the console.
+ * rest is done in bmk_main()
+ */
+void
+bmk_init(void)
+{
+	int x;
+
+	for (x = 0; x < CONS_HEIGHT * CONS_WIDTH; x++)
+		cons_putat(' ', x % CONS_WIDTH, x / CONS_WIDTH);
+}
+
+static int parsemem(uint32_t addr, uint32_t len)
+{
+	struct multiboot_mmap_entry *mbm;
+	unsigned long memsize;
+	unsigned long ossize, osbegin, osend;
+	extern char _end[], _begin[];
+	uint32_t off;
+
+	/*
+	 * Look for our memory.  We assume it's just in one chunk
+	 * starting at MEMSTART.
+	 */
+	for (off = 0; off < len; off += mbm->size + sizeof(mbm->size)) {
+		mbm = (void *)(addr + off);
+		if (mbm->addr == MEMSTART
+		    && mbm->type == MULTIBOOT_MEMORY_AVAILABLE) {
+			break;
+		}
+	}
+	assert(off < len);
+
+	memsize = mbm->len;
+	osbegin = (unsigned long)_begin;
+	osend = round_page((unsigned long)_end);
+	ossize = osend - osbegin;
+
+	bmk_membase = mbm->addr + ossize;
+	bmk_memsize = memsize - ossize;
+
+	return 0;
+}
+
+int bmk_parsemem(void *_mbi) {
+  struct multiboot_info *mbi = (struct multiboot_info *) _mbi;
+	if ((mbi->flags & MULTIBOOT_MEMORY_INFO) == 0) {
+		bmk_cons_puts("multiboot memory info not available\n");
+		return 1;
+	}
+	return parsemem(mbi->mmap_addr, mbi->mmap_length);
+}
+

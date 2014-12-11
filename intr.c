@@ -96,23 +96,17 @@ bmk_isr_netinit(int (*func)(void *), void *arg, int intr)
 	return 0;
 }
 
-#include <bmk/machine/versatilepb.h>
-
+/* Not sure what to do about this.
+ * to move to arch dir a lot of stuff in this file also has to move */
+#if 0
 void
 bmk_isr(int which)
 {
-#if 0
 	/* schedule the interrupt handler */
 	isr_todo |= 1<<which;
 	bmk_sched_wake(isr_thread);
-#else
-  bmk_cons_puts("\n\n******** interrupt occured\n\n");
-  
-  // for now, just disable the timer interrupt
-  write32(VPB_TIMER01, Timer1IntClr, 1);
-  write32(VPB_VIC, VIC_INT_ENABLE_CLEAR, 1 << VPB_INTR_TIMER01);
-#endif
 }
+#endif
 
 int
 bmk_isr_init(void)
