@@ -27,10 +27,8 @@ ifeq (${MACHINE},i386)
 supported:= true
 endif
 ifeq (${MACHINE},arm)
-ifdef IWANTARM
 supported:= true
 HASPCI:= n
-endif
 endif
 ifeq (${MACHINE},x86_64)
   supported:= true
@@ -70,18 +68,20 @@ LIBS_NETINET=	-lrumpnet_config -lrumpnet_netinet -lrumpnet_net -lrumpnet
 LIBS_NETBPF=	-lrumpdev_bpf
 LIBS_NETUNIX=	-lrumpnet_local
 
-ALLLIBS=	${LIBS_VIO_NET}					\
-		${LIBS_VIO_LD}					\
-		${LIBS_VIO_RND}					\
-		${LIBS_VIO}					\
-		${LIBS_AUDIO}					\
-		${LIBS_AUDIO_EAP}				\
-		${LIBS_AUDIO_HDA}				\
-		${LIBS_PCI_NET}					\
-		${LIBS_PCI}					\
-		${LIBS_NETINET}					\
-		${LIBS_NETBPF}					\
-		-lrumpdev -lrumpvfs -lrump
+#ALLLIBS=	${LIBS_VIO_NET}					\
+#		${LIBS_VIO_LD}					\
+#		${LIBS_VIO_RND}					\
+#		${LIBS_VIO}					\
+#		${LIBS_AUDIO}					\
+#		${LIBS_AUDIO_EAP}				\
+#		${LIBS_AUDIO_HDA}				\
+#		${LIBS_PCI_NET}					\
+#		${LIBS_PCI}					\
+#		${LIBS_NETINET}					\
+#		${LIBS_NETBPF}					\
+#		-lrumpdev -lrumpvfs -lrump
+
+ALLLIBS = -lrump
 
 ifeq (${RUMPRUN_PRESENT},yes)
   OBJS+=	libc_errno.o libc_emul.o libc_malloc.o

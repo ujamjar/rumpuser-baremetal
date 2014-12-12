@@ -27,6 +27,7 @@ loop:
 	b .
 END(_start)
 
+// XXX !!! taken from GPLV3 code.  REDO !!! XXX
 ENTRY(bmk_cpu_isr)
   mov r13,r0                      // save r0 in r13_IRQ 
   sub r0,lr,#4                    // put return address in r0_SYS 

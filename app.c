@@ -35,7 +35,7 @@ rumpkern_config(void)
 	int rv = 1;
 
 	rump_init();
-
+#if 0
 	/* le hack */
 	if (rump_pub_netconfig_ifup("wm0") == 0)
 		rv = rump_pub_netconfig_dhcp_ipv4_oneshot("wm0");
@@ -43,6 +43,7 @@ rumpkern_config(void)
 		rv = rump_pub_netconfig_dhcp_ipv4_oneshot("pcn0");
 	else if (rump_pub_netconfig_ifup("vioif0") == 0)
 		rv = rump_pub_netconfig_dhcp_ipv4_oneshot("vioif0");
+#endif
 	havenet = rv == 0;
 }
 

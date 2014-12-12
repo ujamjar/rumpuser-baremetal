@@ -122,3 +122,5 @@ bmk_isr_init(void)
 		return EGENERIC;
 	return 0;
 }
+
+// vim: set tabstop=8:
